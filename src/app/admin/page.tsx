@@ -8,10 +8,11 @@ export const dynamic = 'force-dynamic'
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: { auth?: string }
+  searchParams: Promise<{ auth?: string }>
 }) {
+  const params = await searchParams
   // Simple auth for demonstration
-  if (searchParams.auth !== 'admin123') {
+  if (params.auth !== 'admin123') {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfbfa' }}>
         <div className="glass-container" style={{ textAlign: 'center' }}>
