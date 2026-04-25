@@ -59,9 +59,9 @@ export async function createOrder(data: { amount: number, firstName: string, las
       }
     })
     return { success: true, orderId: order.id }
-  } catch (e: any) {
-    console.error(e)
-    return { error: 'Fehler beim Erstellen der Bestellung.' }
+  } catch (error: any) {
+    console.error('Create Order Error:', error)
+    return { success: false, error: 'Fehler beim Erstellen der Bestellung: ' + (error.message || String(error)) }
   }
 }
 

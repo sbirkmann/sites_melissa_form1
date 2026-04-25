@@ -1,19 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Minus, Euro, Banknote, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react'
+import { Euro, Banknote, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { createOrder, checkOrderStatus, updateOrderStatus } from '@/app/actions'
 
 export default function CheckoutWizard() {
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<'bar' | 'paypal' | null>(null)
+  
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [imageNumbers, setImageNumbers] = useState('')
   const [notes, setNotes] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'bar' | 'paypal' | null>(null)
   
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderId, setOrderId] = useState<number | null>(null)
@@ -36,8 +37,13 @@ export default function CheckoutWizard() {
     setOrderStatus('pending')
   }
 
-  const handleFinalSubmit = async (method: 'bar' | 'paypal') => {
+  const handleSelectMethod = (method: 'bar' | 'paypal') => {
     setPaymentMethod(method)
+    nextStep()
+  }
+
+  const handleFinalSubmit = async () => {
+    if (!paymentMethod) return
     setIsSubmitting(true)
 
     const res = await createOrder({
@@ -47,17 +53,17 @@ export default function CheckoutWizard() {
       email,
       imageNumbers,
       notes,
-      paymentMethod: method
+      paymentMethod: paymentMethod
     })
 
     if (res.success && res.orderId) {
       setOrderId(res.orderId)
-      if (method === 'bar') {
+      if (paymentMethod === 'bar') {
         setOrderStatus('paid')
       }
       nextStep()
     } else {
-      alert('Fehler beim Speichern der Bestellung.')
+      alert(res.error || 'Fehler beim Speichern der Bestellung.')
     }
     setIsSubmitting(false)
   }
@@ -83,7 +89,9 @@ export default function CheckoutWizard() {
     return () => clearInterval(interval)
   }, [step, paymentMethod, orderStatus, orderId])
 
-  // Step 1: Amount
+  // -------------------------------------------------------------
+  // STEP 1: AMOUNT
+  // -------------------------------------------------------------
   if (step === 1) {
     return (
       <div style={{ textAlign: 'center' }}>
@@ -113,15 +121,65 @@ export default function CheckoutWizard() {
     )
   }
 
-  // Step 2: Customer Details
+  // -------------------------------------------------------------
+  // STEP 2: PAYMENT METHOD
+  // -------------------------------------------------------------
   if (step === 2) {
     return (
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
-          <button onClick={prevStep} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', display: 'flex', alignItems: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', justifyContent: 'center', position: 'relative' }}>
+          <button onClick={prevStep} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', position: 'absolute', left: '0', display: 'flex', alignItems: 'center' }}>
             <ArrowLeft size={24} /> <span style={{ fontSize: '1.1rem', marginLeft: '0.5rem' }}>Zurück</span>
           </button>
-          <h2 style={{ fontSize: '1.8rem', margin: '0 auto', paddingRight: '100px' }}>Kundendaten</h2>
+          <h2 style={{ fontSize: '2rem', margin: 0 }}>Zahlungsart wählen</h2>
+        </div>
+
+        <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '3rem' }}>Betrag: <strong>{amount} €</strong></p>
+
+        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => handleSelectMethod('bar')}
+            style={{ 
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
+              padding: '3rem', borderRadius: '24px', border: '2px solid #e0e0e0',
+              background: '#fff', cursor: 'pointer', transition: 'all 0.2s ease', width: '250px'
+            }}
+            onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+            onMouseOut={e => e.currentTarget.style.borderColor = '#e0e0e0'}
+          >
+            <Banknote size={64} color="#4CAF50" />
+            <span style={{ fontSize: '1.5rem', fontWeight: 600 }}>Barzahlung</span>
+          </button>
+
+          <button 
+            onClick={() => handleSelectMethod('paypal')}
+            style={{ 
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
+              padding: '3rem', borderRadius: '24px', border: '2px solid #e0e0e0',
+              background: '#fff', cursor: 'pointer', transition: 'all 0.2s ease', width: '250px'
+            }}
+            onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+            onMouseOut={e => e.currentTarget.style.borderColor = '#e0e0e0'}
+          >
+            <CreditCard size={64} color="#003087" />
+            <span style={{ fontSize: '1.5rem', fontWeight: 600 }}>PayPal</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // -------------------------------------------------------------
+  // STEP 3: CUSTOMER FORM
+  // -------------------------------------------------------------
+  if (step === 3) {
+    return (
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', justifyContent: 'center', position: 'relative' }}>
+          <button onClick={prevStep} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', position: 'absolute', left: '0', display: 'flex', alignItems: 'center' }}>
+            <ArrowLeft size={24} /> <span style={{ fontSize: '1.1rem', marginLeft: '0.5rem' }}>Zurück</span>
+          </button>
+          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>Kundendaten</h2>
         </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '500px', margin: '0 auto' }}>
@@ -152,65 +210,21 @@ export default function CheckoutWizard() {
           </div>
 
           <button 
-            onClick={nextStep} 
-            disabled={!firstName || !lastName || !email}
+            onClick={handleFinalSubmit} 
+            disabled={!firstName || !lastName || !email || isSubmitting}
             className="btn" 
             style={{ marginTop: '1rem', width: '100%', fontSize: '1.2rem' }}
           >
-            Weiter zur Zahlung
+            {isSubmitting ? 'Wird gespeichert...' : 'Kauf abschließen'}
           </button>
         </div>
       </div>
     )
   }
 
-  // Step 3: Payment Method
-  if (step === 3) {
-    return (
-      <div style={{ textAlign: 'center' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Zahlungsart wählen</h2>
-        <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '3rem' }}>Betrag: <strong>{amount} €</strong></p>
-
-        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button 
-            onClick={() => handleFinalSubmit('bar')}
-            disabled={isSubmitting}
-            style={{ 
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
-              padding: '3rem', borderRadius: '24px', border: '2px solid #e0e0e0',
-              background: '#fff', cursor: 'pointer', transition: 'all 0.2s ease', width: '250px'
-            }}
-            onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'}
-            onMouseOut={e => e.currentTarget.style.borderColor = '#e0e0e0'}
-          >
-            <Banknote size={64} color="#4CAF50" />
-            <span style={{ fontSize: '1.5rem', fontWeight: 600 }}>Barzahlung</span>
-          </button>
-
-          <button 
-            onClick={() => handleFinalSubmit('paypal')}
-            disabled={isSubmitting}
-            style={{ 
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
-              padding: '3rem', borderRadius: '24px', border: '2px solid #e0e0e0',
-              background: '#fff', cursor: 'pointer', transition: 'all 0.2s ease', width: '250px'
-            }}
-            onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'}
-            onMouseOut={e => e.currentTarget.style.borderColor = '#e0e0e0'}
-          >
-            <CreditCard size={64} color="#003087" />
-            <span style={{ fontSize: '1.5rem', fontWeight: 600 }}>PayPal</span>
-          </button>
-        </div>
-        
-        <button onClick={prevStep} className="btn" style={{ background: '#eee', color: '#333', marginTop: '3rem' }}>
-          Zurück
-        </button>
-      </div>
-    )
-  }
-
-  // Step 4: Confirmation / QR Code
+  // -------------------------------------------------------------
+  // STEP 4: CONFIRMATION / QR CODE
+  // -------------------------------------------------------------
   if (step === 4) {
     if (paymentMethod === 'bar') {
       return (
