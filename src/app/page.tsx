@@ -9,27 +9,7 @@ export default function Home() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Background decoration */}
-      <div style={{
-        position: 'absolute',
-        top: '-10%',
-        left: '-10%',
-        width: '50vw',
-        height: '50vw',
-        background: 'radial-gradient(circle, rgba(159,183,200,0.3) 0%, rgba(255,255,255,0) 70%)',
-        zIndex: -1,
-        borderRadius: '50%'
-      }}></div>
-      <div style={{
-        position: 'absolute',
-        bottom: '-10%',
-        right: '-10%',
-        width: '60vw',
-        height: '60vw',
-        background: 'radial-gradient(circle, rgba(223,210,216,0.3) 0%, rgba(255,255,255,0) 70%)',
-        zIndex: -1,
-        borderRadius: '50%'
-      }}></div>
+
 
       <div style={{ 
         maxWidth: '100%', 
