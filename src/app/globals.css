@@ -1,8 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Poppins:wght@300;400;500;600&display=swap');
 
 :root {
-  --primary: #c29d81;
-  --primary-hover: #b08969;
+  --blau: #9fb7c8;
+  --gruen: #afc5cb;
+  --rosa: #dfd2d8;
+
+  --primary: var(--blau);
+  --primary-hover: #86a0b3; /* slightly darker blue for hover states */
   --bg-color: #fcfbfa;
   --text-color: #333333;
   --glass-bg: rgba(255, 255, 255, 0.85);

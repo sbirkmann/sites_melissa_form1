@@ -11,8 +11,9 @@ export default async function AdminPage({
   searchParams: Promise<{ auth?: string }>
 }) {
   const params = await searchParams
-  // Simple auth for demonstration
-  if (params.auth !== 'admin123') {
+  // Authentifizierung via Environment Variable
+  const adminPassword = process.env.ADMIN_PASSWORD
+  if (params.auth !== adminPassword) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfbfa' }}>
         <div className="glass-container" style={{ textAlign: 'center' }}>

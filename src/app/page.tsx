@@ -16,7 +16,7 @@ export default function Home() {
         left: '-10%',
         width: '50vw',
         height: '50vw',
-        background: 'radial-gradient(circle, rgba(194,157,129,0.15) 0%, rgba(255,255,255,0) 70%)',
+        background: 'radial-gradient(circle, rgba(159,183,200,0.3) 0%, rgba(255,255,255,0) 70%)',
         zIndex: -1,
         borderRadius: '50%'
       }}></div>
@@ -26,7 +26,7 @@ export default function Home() {
         right: '-10%',
         width: '60vw',
         height: '60vw',
-        background: 'radial-gradient(circle, rgba(230,200,180,0.2) 0%, rgba(255,255,255,0) 70%)',
+        background: 'radial-gradient(circle, rgba(223,210,216,0.3) 0%, rgba(255,255,255,0) 70%)',
         zIndex: -1,
         borderRadius: '50%'
       }}></div>
