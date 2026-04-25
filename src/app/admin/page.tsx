@@ -39,11 +39,13 @@ export default async function AdminPage({
     <main style={{ padding: '3rem', maxWidth: '1000px', margin: '0 auto' }}>
       {/* Header Section */}
       <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <img 
-          src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
-          alt="MelissaRebecca Fotografie" 
-          style={{ height: '70px', objectFit: 'contain' }}
-        />
+        <div style={{ background: 'white', padding: '1rem', borderRadius: '16px', display: 'inline-block', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+          <img 
+            src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
+            alt="MelissaRebecca Fotografie" 
+            style={{ height: '70px', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
       </header>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>

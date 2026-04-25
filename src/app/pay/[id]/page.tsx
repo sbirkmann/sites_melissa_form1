@@ -43,11 +43,13 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
 
       {/* Header Section */}
       <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <img 
-          src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
-          alt="MelissaRebecca Fotografie" 
-          style={{ height: '70px', objectFit: 'contain' }}
-        />
+        <div style={{ background: 'white', padding: '1rem', borderRadius: '16px', display: 'inline-block', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+          <img 
+            src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
+            alt="MelissaRebecca Fotografie" 
+            style={{ height: '70px', objectFit: 'contain', display: 'block' }}
+          />
+        </div>
       </header>
 
       <div className="glass-container" style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '3rem 2rem' }}>

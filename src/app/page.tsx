@@ -44,11 +44,13 @@ export default function Home() {
         
         {/* Header Section */}
         <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <img 
-            src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
-            alt="Melissa Rebecca Fotografie Logo" 
-            style={{ maxWidth: '250px', height: 'auto' }} 
-          />
+          <div style={{ background: 'white', padding: '1rem', borderRadius: '16px', display: 'inline-block', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+            <img 
+              src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
+              alt="Melissa Rebecca Fotografie Logo" 
+              style={{ maxWidth: '250px', height: 'auto', display: 'block' }} 
+            />
+          </div>
         </header>
 
         <div style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
