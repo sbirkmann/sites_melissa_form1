@@ -7,7 +7,7 @@
 
   --primary: var(--blau);
   --primary-hover: #86a0b3; /* slightly darker blue for hover states */
-  --bg-color: #fcfbfa;
+  --bg-color: var(--blau);
   --text-color: #333333;
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(255, 255, 255, 0.4);
@@ -77,13 +77,13 @@ a:hover {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(194, 157, 129, 0.4);
+  box-shadow: 0 4px 15px rgba(159, 183, 200, 0.4);
 }
 
 .btn:hover {
   background-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(194, 157, 129, 0.5);
+  box-shadow: 0 6px 20px rgba(159, 183, 200, 0.5);
 }
 
 .btn:disabled {
