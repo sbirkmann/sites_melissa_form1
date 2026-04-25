@@ -11,8 +11,8 @@ export default function CheckoutWizard() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-  const [imageFields, setImageFields] = useState<number[]>([Date.now()])
-  const [imageValues, setImageValues] = useState<{ [key: number]: string }>({})
+  const [imageNumbers, setImageNumbers] = useState('')
+  const [notes, setNotes] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<'bar' | 'paypal' | null>(null)
   
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -29,39 +29,24 @@ export default function CheckoutWizard() {
     setFirstName('')
     setLastName('')
     setEmail('')
-    setImageFields([Date.now()])
-    setImageValues({})
+    setImageNumbers('')
+    setNotes('')
     setPaymentMethod(null)
     setOrderId(null)
     setOrderStatus('pending')
-  }
-
-  const handleImageValueChange = (id: number, val: string) => {
-    setImageValues(prev => ({ ...prev, [id]: val }))
-  }
-
-  const addImageField = () => setImageFields([...imageFields, Date.now()])
-  const removeImageField = (idToRemove: number) => {
-    if (imageFields.length > 1) {
-      setImageFields(imageFields.filter(id => id !== idToRemove))
-      const newVals = { ...imageValues }
-      delete newVals[idToRemove]
-      setImageValues(newVals)
-    }
   }
 
   const handleFinalSubmit = async (method: 'bar' | 'paypal') => {
     setPaymentMethod(method)
     setIsSubmitting(true)
 
-    const imagesStr = imageFields.map(id => imageValues[id]).filter(v => v && v.trim() !== '').join(', ')
-
     const res = await createOrder({
       amount: parseFloat(amount.replace(',', '.')),
       firstName,
       lastName,
       email,
-      imageNumbers: imagesStr,
+      imageNumbers,
+      notes,
       paymentMethod: method
     })
 
@@ -146,28 +131,24 @@ export default function CheckoutWizard() {
           </div>
           <input type="email" placeholder="E-Mail Adresse" value={email} onChange={e => setEmail(e.target.value)} className="input-field" required />
           
-          <div style={{ marginTop: '1rem' }}>
-            <p style={{ fontWeight: 500, marginBottom: '0.5rem' }}>Bildnummern:</p>
-            {imageFields.map((fieldId, index) => (
-              <div key={fieldId} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                <input 
-                  type="text" 
-                  value={imageValues[fieldId] || ''}
-                  onChange={(e) => handleImageValueChange(fieldId, e.target.value)}
-                  placeholder="z.B. IMG_1234" 
-                  className="input-field"
-                />
-                {index === imageFields.length - 1 ? (
-                  <button type="button" onClick={addImageField} style={{ background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-                    <Plus size={24} />
-                  </button>
-                ) : (
-                  <button type="button" onClick={() => removeImageField(fieldId)} style={{ background: '#f44336', color: 'white', border: 'none', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-                    <Minus size={24} />
-                  </button>
-                )}
-              </div>
-            ))}
+          <div style={{ marginTop: '0.5rem' }}>
+            <input 
+              type="text" 
+              placeholder="Bildnummern (z.B. IMG_1234, IMG_1235)" 
+              value={imageNumbers} 
+              onChange={e => setImageNumbers(e.target.value)} 
+              className="input-field" 
+            />
+          </div>
+          
+          <div style={{ marginTop: '0.5rem' }}>
+            <textarea 
+              placeholder="Weitere Wünsche oder Anmerkungen (optional)" 
+              value={notes} 
+              onChange={e => setNotes(e.target.value)} 
+              className="input-field" 
+              style={{ minHeight: '100px', resize: 'vertical', paddingTop: '1rem', fontFamily: 'inherit' }}
+            />
           </div>
 
           <button 

@@ -12,6 +12,7 @@ model Lead {
   name         String
   email        String   @unique
   imageNumbers String?  // Will store comma-separated list or JSON
+  notes        String?
   createdAt    DateTime @default(now())
 }
 
@@ -22,6 +23,7 @@ model Order {
   lastName      String
   email         String
   imageNumbers  String?
+  notes         String?
   paymentMethod String   // 'bar' oder 'paypal'
   status        String   // 'pending', 'paid', 'cancelled'
   paypalOrderId String?  // falls wir offizielle PayPal API nutzen

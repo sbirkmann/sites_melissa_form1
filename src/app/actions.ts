@@ -8,6 +8,7 @@ export async function submitLead(formData: FormData) {
   const email = formData.get('email') as string
   const imageNumbersRaw = formData.getAll('imageNumber') as string[]
   const imageNumbers = imageNumbersRaw.filter(val => val.trim() !== '').join(', ')
+  const notes = formData.get('notes') as string || ''
 
   if (!name || !email) {
     return { error: 'Bitte fülle alle Felder aus.' }
@@ -18,7 +19,8 @@ export async function submitLead(formData: FormData) {
       data: { 
         name, 
         email,
-        imageNumbers: imageNumbers || null
+        imageNumbers: imageNumbers || null,
+        notes: notes || null
       },
     })
     return { success: true }
@@ -42,7 +44,7 @@ export async function deleteLead(id: number) {
   }
 }
 
-export async function createOrder(data: { amount: number, firstName: string, lastName: string, email: string, imageNumbers: string, paymentMethod: string }) {
+export async function createOrder(data: { amount: number, firstName: string, lastName: string, email: string, imageNumbers: string, notes: string, paymentMethod: string }) {
   try {
     const order = await prisma.order.create({
       data: {
@@ -51,6 +53,7 @@ export async function createOrder(data: { amount: number, firstName: string, las
         lastName: data.lastName,
         email: data.email,
         imageNumbers: data.imageNumbers || null,
+        notes: data.notes || null,
         paymentMethod: data.paymentMethod,
         status: data.paymentMethod === 'bar' ? 'paid' : 'pending',
       }

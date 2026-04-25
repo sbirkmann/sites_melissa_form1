@@ -1,31 +1,18 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { submitLead } from '@/app/actions'
-import { Plus, Minus } from 'lucide-react'
 
 export default function LeadForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
-  const [imageFields, setImageFields] = useState<number[]>([Date.now()])
   const formRef = useRef<HTMLFormElement>(null)
 
   const resetForm = () => {
     setStatus('idle')
     setErrorMessage('')
-    setImageFields([Date.now()])
     if (formRef.current) formRef.current.reset()
   }
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout
-    if (status === 'success') {
-      timeout = setTimeout(() => {
-        resetForm()
-      }, 15000)
-    }
-    return () => clearTimeout(timeout)
-  }, [status])
 
   async function handleSubmit(formData: FormData) {
     setStatus('loading')
@@ -38,16 +25,6 @@ export default function LeadForm() {
       setErrorMessage(result.error)
     } else {
       setStatus('success')
-    }
-  }
-
-  const addImageField = () => {
-    setImageFields([...imageFields, Date.now()])
-  }
-
-  const removeImageField = (idToRemove: number) => {
-    if (imageFields.length > 1) {
-      setImageFields(imageFields.filter(id => id !== idToRemove))
     }
   }
 
@@ -89,59 +66,21 @@ export default function LeadForm() {
       </div>
 
       <div style={{ marginTop: '0.5rem' }}>
-        <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 500 }}>Bildnummern (optional):</p>
-        {imageFields.map((fieldId, index) => (
-          <div key={fieldId} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              name="imageNumber" 
-              placeholder="z.B. IMG_1234" 
-              className="input-field"
-              style={{ padding: '0.8rem 1rem' }}
-            />
-            {index === imageFields.length - 1 ? (
-              <button 
-                type="button" 
-                onClick={addImageField}
-                style={{ 
-                  background: 'var(--primary)', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '50%', 
-                  width: '50px', 
-                  height: '50px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0
-                }}
-              >
-                <Plus size={24} />
-              </button>
-            ) : (
-              <button 
-                type="button" 
-                onClick={() => removeImageField(fieldId)}
-                style={{ 
-                  background: '#f44336', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '50%', 
-                  width: '50px', 
-                  height: '50px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0
-                }}
-              >
-                <Minus size={24} />
-              </button>
-            )}
-          </div>
-        ))}
+        <input 
+          type="text" 
+          name="imageNumber" 
+          placeholder="Bildnummern (z.B. IMG_1234, IMG_1235)" 
+          className="input-field"
+        />
+      </div>
+      
+      <div style={{ marginTop: '0.5rem' }}>
+        <textarea 
+          name="notes"
+          placeholder="Weitere Wünsche oder Anmerkungen (optional)" 
+          className="input-field"
+          style={{ minHeight: '100px', resize: 'vertical', paddingTop: '1rem', fontFamily: 'inherit' }}
+        />
       </div>
       
       {status === 'error' && (
