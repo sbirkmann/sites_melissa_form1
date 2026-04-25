@@ -34,9 +34,7 @@ export async function submitLead(formData: FormData) {
 
 export async function deleteLead(id: number) {
   try {
-    await prisma.lead.delete({
-      where: { id },
-    })
+    await prisma.lead.delete({ where: { id } })
     revalidatePath('/admin')
     return { success: true }
   } catch (e: any) {
@@ -58,6 +56,12 @@ export async function createOrder(data: { amount: number, firstName: string, las
         status: data.paymentMethod === 'bar' ? 'paid' : 'pending',
       }
     })
+
+    // Sofort E-Mail senden bei Barzahlung
+    if (data.paymentMethod === 'bar') {
+      await sendOrderConfirmationEmail(order.id)
+    }
+
     return { success: true, orderId: order.id }
   } catch (error: any) {
     console.error('Create Order Error:', error)
@@ -80,6 +84,12 @@ export async function updateOrderStatus(orderId: number, status: string) {
       where: { id: orderId },
       data: { status }
     })
+
+    // E-Mail senden wenn Zahlung bestätigt
+    if (status === 'paid') {
+      await sendOrderConfirmationEmail(orderId)
+    }
+
     revalidatePath('/admin')
     return { success: true }
   } catch (e) {
@@ -89,12 +99,127 @@ export async function updateOrderStatus(orderId: number, status: string) {
 
 export async function deleteOrder(id: number) {
   try {
-    await prisma.order.delete({
-      where: { id },
-    })
+    await prisma.order.delete({ where: { id } })
     revalidatePath('/admin')
     return { success: true }
   } catch (e: any) {
     return { error: 'Fehler beim Löschen der Bestellung.' }
+  }
+}
+
+// ---------------------------------------------------------------
+// EMAIL SETTINGS
+// ---------------------------------------------------------------
+
+export async function getEmailSettings() {
+  try {
+    let settings = await prisma.emailSettings.findFirst()
+    if (!settings) {
+      settings = await prisma.emailSettings.create({ data: {} })
+    }
+    return { success: true, settings }
+  } catch (e: any) {
+    return { success: false, error: e.message }
+  }
+}
+
+export async function saveEmailSettings(formData: FormData) {
+  try {
+    const existing = await prisma.emailSettings.findFirst()
+
+    const data = {
+      enabled:      formData.get('enabled') === 'true',
+      smtpHost:     formData.get('smtpHost') as string || '',
+      smtpPort:     parseInt(formData.get('smtpPort') as string || '587'),
+      smtpUser:     formData.get('smtpUser') as string || '',
+      smtpPassword: formData.get('smtpPassword') as string || '',
+      smtpSecure:   formData.get('smtpSecure') === 'true',
+      fromName:     formData.get('fromName') as string || '',
+      fromEmail:    formData.get('fromEmail') as string || '',
+      subject:      formData.get('subject') as string || 'Deine Bestellbestätigung',
+      bodyHtml:     formData.get('bodyHtml') as string || '',
+    }
+
+    if (existing) {
+      await prisma.emailSettings.update({ where: { id: existing.id }, data })
+    } else {
+      await prisma.emailSettings.create({ data })
+    }
+
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (e: any) {
+    return { success: false, error: e.message }
+  }
+}
+
+export async function sendOrderConfirmationEmail(orderId: number) {
+  try {
+    const settings = await prisma.emailSettings.findFirst()
+    if (!settings || !settings.enabled) return { success: false, reason: 'disabled' }
+
+    const order = await prisma.order.findUnique({ where: { id: orderId } })
+    if (!order) return { success: false, reason: 'order not found' }
+
+    const nodemailer = await import('nodemailer')
+
+    const transporter = nodemailer.createTransport({
+      host: settings.smtpHost,
+      port: settings.smtpPort,
+      secure: settings.smtpSecure,
+      auth: {
+        user: settings.smtpUser,
+        pass: settings.smtpPassword,
+      },
+    })
+
+    // Platzhalter ersetzen
+    const html = settings.bodyHtml
+      .replace(/\{\{firstName\}\}/g, order.firstName)
+      .replace(/\{\{lastName\}\}/g, order.lastName)
+      .replace(/\{\{email\}\}/g, order.email)
+      .replace(/\{\{amount\}\}/g, order.amount.toFixed(2))
+      .replace(/\{\{imageNumbers\}\}/g, order.imageNumbers || '-')
+      .replace(/\{\{notes\}\}/g, order.notes || '-')
+      .replace(/\{\{paymentMethod\}\}/g, order.paymentMethod === 'bar' ? 'Barzahlung' : 'PayPal')
+
+    await transporter.sendMail({
+      from: `"${settings.fromName}" <${settings.fromEmail}>`,
+      to: order.email,
+      subject: settings.subject,
+      html,
+    })
+
+    return { success: true }
+  } catch (e: any) {
+    console.error('Email send error:', e)
+    return { success: false, error: e.message }
+  }
+}
+
+export async function testEmailSettings(formData: FormData) {
+  try {
+    const nodemailer = await import('nodemailer')
+
+    const host     = formData.get('smtpHost') as string
+    const port     = parseInt(formData.get('smtpPort') as string || '587')
+    const user     = formData.get('smtpUser') as string
+    const pass     = formData.get('smtpPassword') as string
+    const secure   = formData.get('smtpSecure') === 'true'
+    const from     = `"${formData.get('fromName')}" <${formData.get('fromEmail')}>`
+    const testTo   = formData.get('testEmail') as string
+
+    const transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } })
+
+    await transporter.sendMail({
+      from,
+      to: testTo,
+      subject: 'Test-Mail – MelissaRebecca POS',
+      html: '<p>✅ SMTP-Verbindung funktioniert!</p>',
+    })
+
+    return { success: true }
+  } catch (e: any) {
+    return { success: false, error: e.message }
   }
 }

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { deleteLead } from '@/app/actions'
+import { deleteLead, saveEmailSettings, testEmailSettings, getEmailSettings } from '@/app/actions'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -27,13 +27,9 @@ export default async function AdminPage({
     )
   }
 
-  const leads = await prisma.lead.findMany({
-    orderBy: { createdAt: 'desc' }
-  })
-
-  const orders = await prisma.order.findMany({
-    orderBy: { createdAt: 'desc' }
-  })
+  const leads = await prisma.lead.findMany({ orderBy: { createdAt: 'desc' } })
+  const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' } })
+  const { settings: emailSettings } = await getEmailSettings()
 
   return (
     <main style={{ padding: '3rem', maxWidth: '1000px', margin: '0 auto' }}>
@@ -171,6 +167,135 @@ export default async function AdminPage({
             </table>
           </div>
         )}
+      </div>
+
+      {/* E-Mail Einstellungen */}
+      <div style={{ marginTop: '4rem' }}>
+        <h2 style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>📧 E-Mail Einstellungen</h2>
+        <div className="glass-container">
+          <form action={async (formData: FormData) => {
+            'use server'
+            await saveEmailSettings(formData)
+          }}>
+            {/* Aktivieren */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', padding: '1rem', background: emailSettings?.enabled ? '#e8f5e9' : '#fff3e0', borderRadius: '12px' }}>
+              <label style={{ fontWeight: 600, fontSize: '1.1rem' }}>E-Mail-Versand aktiv:</label>
+              <select name="enabled" defaultValue={emailSettings?.enabled ? 'true' : 'false'} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}>
+                <option value="true">✅ Aktiv</option>
+                <option value="false">❌ Inaktiv</option>
+              </select>
+            </div>
+
+            {/* SMTP */}
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', marginTop: '1.5rem' }}>SMTP Server</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Host</label>
+                <input type="text" name="smtpHost" defaultValue={emailSettings?.smtpHost || ''} placeholder="smtp.example.com" className="input-field" />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Port</label>
+                <input type="number" name="smtpPort" defaultValue={emailSettings?.smtpPort || 587} className="input-field" />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Benutzername</label>
+                <input type="text" name="smtpUser" defaultValue={emailSettings?.smtpUser || ''} placeholder="user@example.com" className="input-field" />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Passwort</label>
+                <input type="password" name="smtpPassword" defaultValue={emailSettings?.smtpPassword || ''} placeholder="••••••••" className="input-field" />
+              </div>
+            </div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <select name="smtpSecure" defaultValue={emailSettings?.smtpSecure ? 'true' : 'false'} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #ddd' }}>
+                  <option value="false">STARTTLS (Port 587)</option>
+                  <option value="true">SSL/TLS (Port 465)</option>
+                </select>
+                <span style={{ fontSize: '0.9rem', color: '#666' }}>Verbindungstyp</span>
+              </label>
+            </div>
+
+            {/* Absender */}
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', marginTop: '1.5rem' }}>Absender</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Absender Name</label>
+                <input type="text" name="fromName" defaultValue={emailSettings?.fromName || ''} placeholder="MelissaRebecca Fotografie" className="input-field" />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Absender E-Mail</label>
+                <input type="email" name="fromEmail" defaultValue={emailSettings?.fromEmail || ''} placeholder="hallo@example.com" className="input-field" />
+              </div>
+            </div>
+
+            {/* Betreff */}
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', marginTop: '1.5rem' }}>Mailinhalt</h3>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem', color: '#666' }}>Betreff</label>
+              <input type="text" name="subject" defaultValue={emailSettings?.subject || 'Deine Bestellbestätigung'} className="input-field" />
+            </div>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.8rem', fontSize: '0.9rem', color: '#666' }}>Mail-Text (HTML)</label>
+
+              {/* Platzhalter Info-Box */}
+              <div style={{ background: '#f0f7ff', border: '1px solid #b3d4f5', borderRadius: '12px', padding: '1.2rem', marginBottom: '1rem' }}>
+                <p style={{ fontWeight: 600, marginBottom: '0.8rem', color: '#1a5276', fontSize: '0.95rem' }}>
+                  📋 Verfügbare Platzhalter im Betreff &amp; HTML-Body:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem 2rem' }}>
+                  {[
+                    ['{{firstName}}', 'Vorname des Kunden'],
+                    ['{{lastName}}', 'Nachname des Kunden'],
+                    ['{{email}}', 'E-Mail des Kunden'],
+                    ['{{amount}}', 'Betrag in EUR (z.B. 49.00)'],
+                    ['{{imageNumbers}}', 'Eingegebene Bildnummern'],
+                    ['{{notes}}', 'Weitere Wünsche / Anmerkungen'],
+                    ['{{paymentMethod}}', '"Barzahlung" oder "PayPal"'],
+                  ].map(([ph, desc]) => (
+                    <div key={ph} style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+                      <code style={{ background: '#dceefb', padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.85rem', fontFamily: 'monospace', whiteSpace: 'nowrap', color: '#1a5276' }}>{ph}</code>
+                      <span style={{ fontSize: '0.82rem', color: '#555' }}>{desc}</span>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ marginTop: '0.8rem', fontSize: '0.82rem', color: '#555' }}>
+                  <strong>Beispiel:</strong> <code style={{ background: '#dceefb', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>{`<p>Hallo {{firstName}}, dein Betrag von {{amount}} € wurde bezahlt.</p>`}</code>
+                </p>
+              </div>
+
+              <textarea
+                name="bodyHtml"
+                defaultValue={emailSettings?.bodyHtml || '<p>Hallo {{firstName}},</p>\n<p>vielen Dank für deine Bestellung! 🎉</p>\n<p>Betrag: {{amount}} €<br/>Bildnummern: {{imageNumbers}}<br/>Anmerkungen: {{notes}}</p>\n<p>Herzliche Grüße,<br/>MelissaRebecca Fotografie</p>'}
+                style={{ width: '100%', minHeight: '220px', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'monospace', fontSize: '0.9rem', resize: 'vertical', boxSizing: 'border-box' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+              <button type="submit" className="btn">💾 Einstellungen speichern</button>
+            </div>
+          </form>
+
+          {/* Test-Mail */}
+          <form action={async (formData: FormData) => {
+            'use server'
+            const result = await testEmailSettings(formData)
+            if (!result.success) console.error('Test-Mail Fehler:', result.error)
+          }} style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>🧪 Test-Mail senden</h3>
+            <input type="hidden" name="smtpHost" value={emailSettings?.smtpHost || ''} />
+            <input type="hidden" name="smtpPort" value={emailSettings?.smtpPort || 587} />
+            <input type="hidden" name="smtpUser" value={emailSettings?.smtpUser || ''} />
+            <input type="hidden" name="smtpPassword" value={emailSettings?.smtpPassword || ''} />
+            <input type="hidden" name="smtpSecure" value={emailSettings?.smtpSecure ? 'true' : 'false'} />
+            <input type="hidden" name="fromName" value={emailSettings?.fromName || ''} />
+            <input type="hidden" name="fromEmail" value={emailSettings?.fromEmail || ''} />
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <input type="email" name="testEmail" placeholder="Test-Empfänger E-Mail" className="input-field" style={{ maxWidth: '300px' }} />
+              <button type="submit" className="btn" style={{ background: '#555', whiteSpace: 'nowrap' }}>📨 Test senden</button>
+            </div>
+          </form>
+        </div>
       </div>
 
       {/* Footer */}

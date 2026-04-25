@@ -29,3 +29,17 @@ model Order {
   paypalOrderId String?  // falls wir offizielle PayPal API nutzen
   createdAt     DateTime @default(now())
 }
+
+model EmailSettings {
+  id           Int     @id @default(autoincrement())
+  enabled      Boolean @default(false)
+  smtpHost     String  @default("")
+  smtpPort     Int     @default(587)
+  smtpUser     String  @default("")
+  smtpPassword String  @default("")
+  smtpSecure   Boolean @default(false)
+  fromName     String  @default("")
+  fromEmail    String  @default("")
+  subject      String  @default("Deine Bestellbestätigung")
+  bodyHtml     String  @default("<p>Vielen Dank für deine Bestellung!</p>")
+}
