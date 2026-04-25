@@ -182,8 +182,8 @@ export default async function AdminPage({
         marginTop: '3rem'
       }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-          <a href="https://www.melissarebecca-fotografie.de/impressum" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#aaa', textDecoration: 'none' }}>Impressum</a>
-          <a href="https://www.melissarebecca-fotografie.de/datenschutz" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#aaa', textDecoration: 'none' }}>Datenschutz</a>
+          <a href="https://www.melissarebecca-fotografie.de/impressum" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#000', textDecoration: 'none' }}>Impressum</a>
+          <a href="https://www.melissarebecca-fotografie.de/datenschutz" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#000', textDecoration: 'none' }}>Datenschutz</a>
         </div>
       </footer>
     </main>

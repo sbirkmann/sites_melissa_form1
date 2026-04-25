@@ -20,10 +20,18 @@
   padding: 0;
 }
 
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   font-weight: 300;
-  background-color: var(--bg-color);
+  background: linear-gradient(-45deg, var(--blau), var(--gruen), var(--rosa));
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   color: var(--text-color);
   min-height: 100vh;
   display: flex;
