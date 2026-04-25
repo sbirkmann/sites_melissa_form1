@@ -44,6 +44,7 @@ export default function Home() {
         justifyContent: 'center'
       }}>
         
+
         {/* Header Section */}
         <header style={{ textAlign: 'center' }}>
           <img 
@@ -51,13 +52,26 @@ export default function Home() {
             alt="Melissa Rebecca Fotografie Logo" 
             style={{ maxWidth: '250px', height: 'auto', marginBottom: '1.5rem' }} 
           />
+        </header>
+
+        {/* Navigation Tabs */}
+        <nav style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
+          <a href="/" style={{ padding: '0.8rem 2rem', background: 'var(--primary)', color: 'white', borderRadius: '50px', textDecoration: 'none', fontWeight: 600, boxShadow: '0 4px 15px rgba(194, 157, 129, 0.4)' }}>
+            1. Anmeldung
+          </a>
+          <a href="/kauf" style={{ padding: '0.8rem 2rem', background: '#fff', color: '#555', borderRadius: '50px', textDecoration: 'none', fontWeight: 600, border: '1px solid #eee' }}>
+            2. Kasse / Verkauf
+          </a>
+        </nav>
+
+        <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: '2.5rem', color: '#2c2c2c', marginBottom: '0.5rem' }}>
             Hey, schön, dass du dabei bist! 📸
           </h1>
           <p style={{ fontSize: '1.2rem', color: '#555', maxWidth: '600px', margin: '0 auto' }}>
             Ich würde super gern ein paar Fotos von dir machen – danke, dass du offen dafür bist! 🙌
           </p>
-        </header>
+        </div>
 
         <div className="content-grid">
           {/* Form Section */}
@@ -118,7 +132,8 @@ export default function Home() {
         marginTop: 'auto'
       }}>
         <p>Copyright 2024 © MelissaRebecca Fotografie</p>
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '2rem' }}>
+          <a href="/kauf" style={{ fontSize: '0.8rem', color: '#ccc' }}>Kauf / Kasse</a>
           <a href="/admin" style={{ fontSize: '0.8rem', color: '#ccc' }}>Admin Login</a>
         </div>
       </footer>

@@ -14,3 +14,16 @@ model Lead {
   imageNumbers String?  // Will store comma-separated list or JSON
   createdAt    DateTime @default(now())
 }
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  amount        Float
+  firstName     String
+  lastName      String
+  email         String
+  imageNumbers  String?
+  paymentMethod String   // 'bar' oder 'paypal'
+  status        String   // 'pending', 'paid', 'cancelled'
+  paypalOrderId String?  // falls wir offizielle PayPal API nutzen
+  createdAt     DateTime @default(now())
+}

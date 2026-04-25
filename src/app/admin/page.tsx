@@ -30,8 +30,21 @@ export default async function AdminPage({
     orderBy: { createdAt: 'desc' }
   })
 
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: 'desc' }
+  })
+
   return (
     <main style={{ padding: '3rem', maxWidth: '1000px', margin: '0 auto' }}>
+      {/* Header Section */}
+      <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <img 
+          src="https://hostedimages-cdn.aweber-static.com/MjMyNzQxNg==/original/95cd09a0325c4e5a9aa86235c0edb9c4.png" 
+          alt="MelissaRebecca Fotografie" 
+          style={{ height: '70px', objectFit: 'contain' }}
+        />
+      </header>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
         <h1>Admin Dashboard</h1>
         <a href="/" className="btn" style={{ padding: '0.5rem 1.5rem' }}>Zurück zur Seite</a>
@@ -78,6 +91,72 @@ export default async function AdminPage({
                           padding: '0.5rem 1rem', 
                           borderRadius: '8px',
                           cursor: 'pointer'
+                        }}>
+                          Löschen
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="glass-container" style={{ marginTop: '3rem' }}>
+        <h2 style={{ marginBottom: '2rem' }}>Käufe / Bestellungen ({orders.length})</h2>
+        
+        {orders.length === 0 ? (
+          <p>Noch keine Käufe vorhanden.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #eee' }}>
+                  <th style={{ padding: '1rem' }}>Name</th>
+                  <th style={{ padding: '1rem' }}>Betrag</th>
+                  <th style={{ padding: '1rem' }}>Bildnummern</th>
+                  <th style={{ padding: '1rem' }}>Zahlung</th>
+                  <th style={{ padding: '1rem' }}>Status</th>
+                  <th style={{ padding: '1rem' }}>Datum</th>
+                  <th style={{ padding: '1rem', textAlign: 'right' }}>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order: any) => (
+                  <tr key={order.id} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '1rem' }}>{order.firstName} {order.lastName}</td>
+                    <td style={{ padding: '1rem', fontWeight: 'bold' }}>{order.amount.toFixed(2)} €</td>
+                    <td style={{ padding: '1rem' }}>{order.imageNumbers || '-'}</td>
+                    <td style={{ padding: '1rem' }}>
+                      {order.paymentMethod === 'bar' ? '💵 Bar' : '💳 PayPal'}
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      <span style={{
+                        padding: '0.3rem 0.6rem',
+                        borderRadius: '50px',
+                        fontSize: '0.8rem',
+                        background: order.status === 'paid' ? '#e8f5e9' : order.status === 'cancelled' ? '#ffebee' : '#fff3e0',
+                        color: order.status === 'paid' ? '#2e7d32' : order.status === 'cancelled' ? '#c62828' : '#ef6c00'
+                      }}>
+                        {order.status === 'paid' ? 'Bezahlt' : order.status === 'cancelled' ? 'Abgebrochen' : 'Ausstehend'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      {new Date(order.createdAt).toLocaleDateString('de-DE', {
+                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </td>
+                    <td style={{ padding: '1rem', textAlign: 'right' }}>
+                      <form action={async () => {
+                        'use server'
+                        await prisma.order.delete({ where: { id: order.id }})
+                        revalidatePath('/admin')
+                      }}>
+                        <button type="submit" style={{ 
+                          background: '#ffebee', color: '#c62828', border: 'none', 
+                          padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer'
                         }}>
                           Löschen
                         </button>
