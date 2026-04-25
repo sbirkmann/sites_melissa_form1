@@ -77,10 +77,10 @@ export default async function PayPage({ params }: { params: Promise<{ id: string
       </div>
 
       <footer style={{ marginTop: '3rem', textAlign: 'center', display: 'flex', gap: '1.5rem' }}>
-        <a href="https://www.melissarebecca-fotografie.de/impressum" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#aaa', textDecoration: 'none' }}>
+        <a href="https://www.melissarebecca-fotografie.de/impressum" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#000', textDecoration: 'none' }}>
           Impressum
         </a>
-        <a href="https://www.melissarebecca-fotografie.de/datenschutz" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#aaa', textDecoration: 'none' }}>
+        <a href="https://www.melissarebecca-fotografie.de/datenschutz" target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#000', textDecoration: 'none' }}>
           Datenschutz
         </a>
       </footer>
