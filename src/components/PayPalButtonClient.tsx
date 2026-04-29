@@ -2,16 +2,29 @@
 
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { updateOrderStatus } from '@/app/actions';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck } from "lucide-react";
 
 export default function PayPalButtonClient({ orderId, amount }: { orderId: number, amount: number }) {
   const [paid, setPaid] = useState(false);
   const [error, setError] = useState('');
-  
-  // Wir laden die Client ID aus den Umgebungsvariablen.
-  // Wenn diese noch nicht gesetzt ist, nutzen wir "sb" (Sandbox) als Fallback, damit es nicht direkt crasht.
-  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb";
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Client ID sicher vom Server laden (kein Build-Time-Baking)
+  useEffect(() => {
+    fetch('/api/paypal-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.clientId) {
+          setClientId(data.clientId);
+        } else {
+          setError('PayPal Client ID nicht konfiguriert.');
+        }
+      })
+      .catch(() => setError('PayPal-Konfiguration konnte nicht geladen werden.'))
+      .finally(() => setLoading(false));
+  }, []);
 
   if (paid) {
     return (
@@ -23,17 +36,27 @@ export default function PayPalButtonClient({ orderId, amount }: { orderId: numbe
     )
   }
 
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '1rem', color: '#888', fontSize: '0.9rem' }}>
+        PayPal wird geladen…
+      </div>
+    )
+  }
+
+  if (!clientId) {
+    return (
+      <div style={{ background: '#ffebee', color: '#c62828', padding: '1rem', borderRadius: '12px', fontSize: '0.9rem' }}>
+        ⚠️ {error || 'PayPal nicht verfügbar.'}
+      </div>
+    )
+  }
+
   return (
     <div style={{ width: '100%', zIndex: 0, position: 'relative' }}>
       {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
-      
-      {clientId === 'sb' && (
-        <div style={{ background: '#fff3e0', color: '#ef6c00', padding: '1rem', borderRadius: '12px', marginBottom: '1rem', fontSize: '0.9rem' }}>
-          ⚠️ PayPal Client ID fehlt! Bitte in der .env Datei eintragen.
-        </div>
-      )}
 
-      <PayPalScriptProvider options={{ clientId: clientId, currency: "EUR" }}>
+      <PayPalScriptProvider options={{ clientId, currency: "EUR" }}>
         <PayPalButtons 
           style={{ layout: "vertical", shape: "pill", color: "blue" }}
           createOrder={(data, actions) => {
@@ -55,7 +78,6 @@ export default function PayPalButtonClient({ orderId, amount }: { orderId: numbe
               try {
                 const details = await actions.order.capture();
                 if (details.status === "COMPLETED") {
-                  // Sicheres Update in unserer Datenbank!
                   await updateOrderStatus(orderId, 'paid');
                   setPaid(true);
                 } else {
