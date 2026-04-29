@@ -114,6 +114,7 @@ export default async function AdminPage({
               <thead>
                 <tr style={{ borderBottom: '2px solid #eee' }}>
                   <th style={{ padding: '1rem' }}>Name</th>
+                  <th style={{ padding: '1rem' }}>E-Mail</th>
                   <th style={{ padding: '1rem' }}>Betrag</th>
                   <th style={{ padding: '1rem' }}>Bildnummern</th>
                   <th style={{ padding: '1rem' }}>Zahlung</th>
@@ -126,6 +127,7 @@ export default async function AdminPage({
                 {orders.map((order: any) => (
                   <tr key={order.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ padding: '1rem' }}>{order.firstName} {order.lastName}</td>
+                    <td style={{ padding: '1rem' }}>{order.email || '-'}</td>
                     <td style={{ padding: '1rem', fontWeight: 'bold' }}>{order.amount.toFixed(2)} €</td>
                     <td style={{ padding: '1rem' }}>{order.imageNumbers || '-'}</td>
                     <td style={{ padding: '1rem' }}>
