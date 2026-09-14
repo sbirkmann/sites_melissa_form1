@@ -62,6 +62,7 @@ export default async function AdminPage({
                   <th style={{ padding: '1rem' }}>Name</th>
                   <th style={{ padding: '1rem' }}>E-Mail</th>
                   <th style={{ padding: '1rem' }}>Bildnummern</th>
+                  <th style={{ padding: '1rem' }}>Anmerkungen</th>
                   <th style={{ padding: '1rem' }}>Datum</th>
                   <th style={{ padding: '1rem', textAlign: 'right' }}>Aktionen</th>
                 </tr>
@@ -72,6 +73,7 @@ export default async function AdminPage({
                     <td style={{ padding: '1rem' }}>{lead.name}</td>
                     <td style={{ padding: '1rem' }}>{lead.email}</td>
                     <td style={{ padding: '1rem' }}>{lead.imageNumbers || '-'}</td>
+                    <td style={{ padding: '1rem' }}>{lead.notes || '-'}</td>
                     <td style={{ padding: '1rem' }}>
                       {new Date(lead.createdAt).toLocaleDateString('de-DE', {
                         day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -117,6 +119,7 @@ export default async function AdminPage({
                   <th style={{ padding: '1rem' }}>E-Mail</th>
                   <th style={{ padding: '1rem' }}>Betrag</th>
                   <th style={{ padding: '1rem' }}>Bildnummern</th>
+                  <th style={{ padding: '1rem' }}>Anmerkungen</th>
                   <th style={{ padding: '1rem' }}>Zahlung</th>
                   <th style={{ padding: '1rem' }}>Status</th>
                   <th style={{ padding: '1rem' }}>Datum</th>
@@ -130,6 +133,7 @@ export default async function AdminPage({
                     <td style={{ padding: '1rem' }}>{order.email || '-'}</td>
                     <td style={{ padding: '1rem', fontWeight: 'bold' }}>{order.amount.toFixed(2)} €</td>
                     <td style={{ padding: '1rem' }}>{order.imageNumbers || '-'}</td>
+                    <td style={{ padding: '1rem' }}>{order.notes || '-'}</td>
                     <td style={{ padding: '1rem' }}>
                       {order.paymentMethod === 'bar' ? '💵 Bar' : '💳 PayPal'}
                     </td>
